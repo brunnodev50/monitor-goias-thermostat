@@ -1,15 +1,20 @@
 # 🌡️ Monitor Goiás - Termostato Glassmorphism
 
-![GitHub repo size](https://img.shields.io/github/repo-size/brunnodev50/monitor-goias-thermostat?style=flat-square)
-![GitHub language count](https://img.shields.io/github/languages/count/brunnodev50/monitor-goias-thermostat?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/brunnodev50/monitor-goias-thermostat?style=flat-square&color=00a2fa)
+![GitHub language count](https://img.shields.io/github/languages/count/brunnodev50/monitor-goias-thermostat?style=flat-square&color=green)
 ![GitHub last commit](https://img.shields.io/github/last-commit/brunnodev50/monitor-goias-thermostat?style=flat-square)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-> Uma interface de alta fidelidade visual para monitoramento climático em tempo real das 246 cidades do estado de Goiás.
+> Uma aplicação web interativa de alta fidelidade visual que monitora, em tempo real, a temperatura de todas as **246 cidades do estado de Goiás**.
+
+---
+
+### 🚀 **Acesse o Projeto Online (Live Demo)**
+Clique no botão abaixo para ver o termostato funcionando em tempo real através do GitHub Pages:
 
 <p align="center">
   <a href="https://brunnodev50.github.io/monitor-goias-thermostat/">
-    <img src="https://img.shields.io/badge/DEMO_ONLINE-Ver_Projeto_no_GitHub_Pages-00a2fa?style=for-the-badge&logo=github&logoColor=white" alt="Ver Demo Online">
+    <img src="https://img.shields.io/badge/VISITAR_WEBSITE-00a2fa?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Ver Demo Online">
   </a>
 </p>
 
@@ -17,38 +22,41 @@
 
 ## 🖼️ Preview
 
-*(Adicione um print da tela do seu projeto aqui depois, basta arrastar a imagem para essa área de edição do GitHub)*
+<div align="center">
+  <img src="https://via.placeholder.com/800x400.png?text=Preview+Monitor+Goias" alt="Preview do Projeto" width="100%">
+  <br>
+  <em>Interface Glassmorphism com monitoramento em tempo real.</em>
+</div>
 
 ## 📄 Sobre o Projeto
 
-O **Monitor Goiás** é uma aplicação web Full Front-end que combina design moderno (**Glassmorphism**) com engenharia de dados em tempo real. O objetivo foi criar uma experiência visual imersiva onde o usuário pode consultar a temperatura exata de qualquer município goiano.
+O **Monitor Goiás** é uma experiência web que une design de interface avançado (**Glassmorphism**) com consumo de dados em tempo real. O objetivo é fornecer uma visualização climática precisa e esteticamente agradável para qualquer município goiano.
 
-Diferente de widgets comuns, este projeto utiliza **física de fluidos simulada via SVG** para o mercúrio do termostato e consome múltiplas APIs para garantir dados sempre atualizados.
+Diferente de dashboards comuns, este projeto implementa um **simulador de física líquida** para o mercúrio do termostato, utilizando filtros SVG para criar uma distorção orgânica e viva.
 
-## ✨ Funcionalidades
+## 🚀 Tecnologias e Ferramentas
 
-- **🎨 UI Glassmorphism:** Interface sofisticada com efeitos de vidro fosco (`backdrop-filter`), sombras dinâmicas e iluminação neon.
-- **💧 Física de Fluido (SVG):** O líquido do termostato utiliza filtros `feTurbulence` e `feDisplacementMap` para simular um fluido vivo e orgânico.
-- **📡 Dados em Tempo Real:** Conexão direta com a API **Open-Meteo** para buscar a temperatura baseada em geolocalização precisa.
-- **🗺️ Integração IBGE:** Listagem automática e filtro de busca para todas as **246 cidades** de Goiás via API de localidades do IBGE.
-- **🎛️ Calibração Fina:** Variável de controle `CALIBRATION` no código para ajuste manual de discrepâncias térmicas (offset).
-- **👆 Interatividade GSAP:** Botão de controle deslizante com física de inércia e feedback visual instantâneo.
+O projeto foi construído utilizando padrões modernos de desenvolvimento web:
 
-## 🛠️ Tecnologias
+* **HTML5 (Semântico):** Estruturação acessível e otimizada.
+* **CSS3:** Estilização avançada com Variáveis, Flexbox, Grid Layout e Keyframe Animations.
+* **JavaScript ES6+:** Lógica moderna utilizando recursos como Async/Await e Fetch API.
+* **GSAP (GreenSock Animation Platform):** Para animações de interface de alta performance e física de arraste.
+* **APIs Externas:**
+    * **IBGE Localidades:** Para mapeamento oficial dos municípios.
+    * **Open-Meteo Weather API:** Para dados climáticos precisos em tempo real.
 
-Este projeto foi construído utilizando as seguintes tecnologias:
+## ✨ Funcionalidades Principais
 
-- **HTML5** (Semântico)
-- **CSS3** (Variáveis, Flexbox, Grid, Animations)
-- **JavaScript ES6+** (Async/Await, Fetch API)
-- **[GSAP](https://greensock.com/gsap/)** (GreenSock Animation Platform)
-- **APIs Externas:**
-  - [IBGE Localidades](https://servicodados.ibge.gov.br/api/docs/localidades)
-  - [Open-Meteo Weather API](https://open-meteo.com/)
+- [x] **Interface Glassmorphism:** Visual moderno com profundidade, transparências e iluminação neon.
+- [x] **Monitoramento Real:** Dados atualizados via satélite sem cache antigo.
+- [x] **Busca Inteligente:** Filtro instantâneo para localizar qualquer cidade da lista.
+- [x] **Física Interativa:** O usuário pode interagir com o termostato arrastando o indicador.
+- [x] **Responsividade:** Layout adaptável para Desktops, Tablets e Smartphones.
 
-## 🚀 Como Executar Localmente
+## 📦 Como Executar Localmente
 
-Como o projeto não possui dependências de build (como Node.js), é muito simples rodá-lo:
+Não é necessário instalar nada. O projeto é "Plug & Play".
 
 1. **Clone o repositório:**
    ```bash
