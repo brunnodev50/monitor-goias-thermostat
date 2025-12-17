@@ -23,7 +23,7 @@ Clique no botão abaixo para ver o termostato funcionando em tempo real através
 ## 🖼️ Preview
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400.png?text=Preview+Monitor+Goias" alt="Preview do Projeto" width="100%">
+  <img src="https://github.com/user-attachments/assets/35383f34-c751-4b19-b35d-6bfad2a15bdd" alt="Preview do Monitor Goiás" width="100%">
   <br>
   <em>Interface Glassmorphism com monitoramento em tempo real.</em>
 </div>
