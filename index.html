@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor Goiás (Ajustável)</title>
+<style>
+/* --- DESIGN SYSTEM (Glassmorphism Dark) --- */
+:root {
+  --glass-bg: rgba(18, 18, 18, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glow-color: #00a2fa;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+}
+
+* { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0; padding: 0; height: 100vh;
+  background: #000; 
+  background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+  color: var(--text-primary);
+  font-family: "Segoe UI", "Roboto", Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  gap: 60px;
+  position: relative; z-index: 10;
+}
+
+/* --- EFEITO DE VIDRO --- */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* --- COLUNA ESQUERDA: TERMOSTATO --- */
+.thermostat-col {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+
+.thermostat-body {
+  width: 130px; height: 480px;
+  border-radius: 65px;
+  position: relative;
+}
+
+.track {
+  position: absolute; top: 40px; bottom: 40px; left: 50%; transform: translateX(-50%);
+  width: 20px; border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.9);
+  overflow: hidden;
+}
+
+.mercury {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+  background: var(--glow-color);
+  box-shadow: 0 0 25px var(--glow-color);
+  transition: background 0.4s ease;
+  filter: url(#liquidFilter);
+}
+
+.knob-area {
+  position: absolute; top: 40px; bottom: 40px; left: 0; right: 0; pointer-events: none;
+}
+.knob {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(30,30,30,0.95);
+  border: 2px solid rgba(255,255,255,0.15);
+  position: absolute; left: 50%; top: 0;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  cursor: grab; pointer-events: auto;
+  transition: border-color 0.3s, transform 0.1s;
+}
+.knob:active { cursor: grabbing; border-color: var(--glow-color); transform: translate(-50%, -50%) scale(1.05); }
+
+/* Textos */
+.readout { text-align: center; min-width: 250px; }
+
+.temp-display { 
+  font-size: 4rem; font-weight: 700; color: var(--glow-color); 
+  text-shadow: 0 0 30px var(--glow-color); 
+  letter-spacing: -2px; line-height: 1;
+  font-variant-numeric: tabular-nums; 
+}
+.label-display { 
+  font-size: 0.75rem; letter-spacing: 3px; color: var(--text-secondary); 
+  margin-top: 10px; text-transform: uppercase; 
+}
+.status-display { 
+  font-size: 1.1rem; font-weight: 600; color: var(--glow-color); 
+  margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* --- COLUNA DIREITA: CIDADES --- */
+.city-panel {
+  width: 350px; height: 600px; max-height: 85vh;
+  border-radius: 24px;
+  display: flex; flex-direction: column; padding: 25px;
+}
+
+.panel-header { margin-bottom: 15px; }
+.panel-header h3 { margin: 0; font-size: 1.3rem; font-weight: 600; }
+.panel-header p { margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-secondary); }
+
+.search-input {
+  width: 100%; padding: 12px; margin-top: 15px;
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; color: #fff; outline: none;
+  font-size: 0.95rem; transition: 0.3s;
+}
+.search-input:focus { border-color: var(--glow-color); background: rgba(0,0,0,0.5); }
+
+.city-list {
+  flex: 1; overflow-y: auto; margin-top: 10px; padding-right: 8px;
+}
+.city-list::-webkit-scrollbar { width: 4px; }
+.city-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+.city-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px; margin-bottom: 8px;
+  background: rgba(255,255,255,0.03); border-radius: 12px;
+  cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+}
+.city-item:hover { background: rgba(255,255,255,0.07); transform: translateX(3px); }
+.city-item.active { border-color: var(--glow-color); background: rgba(0, 162, 250, 0.1); }
+.c-name { font-size: 0.9rem; font-weight: 500; }
+.c-temp { font-size: 0.9rem; font-weight: 700; color: var(--glow-color); min-width: 50px; text-align: right;}
+
+@media (max-width: 850px) {
+  #app { flex-direction: column; padding: 40px 15px; overflow-y: auto; height: auto; justify-content: flex-start; }
+  .city-panel { width: 100%; max-width: 400px; height: 500px; flex-shrink: 0; }
+}
+
+.spinner { display: inline-block; animation: spin 1s infinite linear; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<svg style="position: absolute; width: 0; height: 0;">
+  <defs>
+    <filter id="liquidFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" />
+    </filter>
+  </defs>
+</svg>
+
+<div id="app">
+  
+  <div class="thermostat-col">
+    <div class="thermostat-body glass-panel">
+      <div id="scaleContainer" style="position: absolute; left: -50px; top: 40px; bottom: 40px; width: 40px;"></div>
+      <div class="track" id="track">
+        <div class="mercury" id="mercury"></div>
+      </div>
+      <div class="knob-area">
+        <div class="knob" id="knob"></div>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="temp-display" id="valTemp">--°</div>
+      <div class="label-display" id="valLabel">AGUARDANDO...</div>
+      <div class="status-display" id="valStatus">--</div>
+    </div>
+  </div>
+
+  <div class="city-panel glass-panel">
+    <div class="panel-header">
+      <h3>Monitor Goiás</h3>
+      <p>Dados Open-Meteo</p>
+      <input type="text" class="search-input" id="searchBox" placeholder="Buscar (ex: Goiânia)...">
+    </div>
+    
+    <div class="city-list" id="cityList">
+      <div style="text-align:center; padding: 20px; color:#666;">Carregando lista IBGE...</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+
+<script>
+// ======================================================
+// ÁREA DE AJUSTE MANUAL (CALIBRAGEM)
+// ======================================================
+// Se o Google diz 21°C e aqui aparece 23°C, coloque -2 abaixo.
+// Se aqui aparece menos que o Google, coloque um número positivo.
+const CALIBRATION = -2; // <--- MEXA AQUI PARA IGUALAR AO GOOGLE
+// ======================================================
+
+const SYS = {
+  minTemp: -5,
+  maxTemp: 50,
+  defaultTemp: 24.0
+};
+
+const ui = {
+  knob: document.getElementById('knob'),
+  track: document.getElementById('track'),
+  mercury: document.getElementById('mercury'),
+  valTemp: document.getElementById('valTemp'),
+  valLabel: document.getElementById('valLabel'),
+  valStatus: document.getElementById('valStatus'),
+  scaleContainer: document.getElementById('scaleContainer'),
+  cityList: document.getElementById('cityList'),
+  searchBox: document.getElementById('searchBox'),
+  root: document.documentElement
+};
+
+let trackHeight = 0;
+let citiesDB = [];
+
+// === LÓGICA DO TERMOSTATO ===
+
+function getStatus(t) {
+  if (t < 5) return { c: '#00eaff', s: 'Congelando 🥶' };
+  if (t < 15) return { c: '#00d2ff', s: 'Frio 🧥' };
+  if (t < 24) return { c: '#00ff73', s: 'Agradável 🍃' };
+  if (t < 30) return { c: '#ffdd00', s: 'Quente ☀️' };
+  if (t < 38) return { c: '#ff8800', s: 'Muito Quente 🔥' };
+  return { c: '#ff0044', s: 'Calor Extremo 🥵' };
+}
+
+function updateUI() {
+  const y = gsap.getProperty(ui.knob, "y");
+  
+  let pct = 1 - (y / trackHeight);
+  pct = Math.max(0, Math.min(1, pct));
+  
+  let tempRaw = SYS.minTemp + pct * (SYS.maxTemp - SYS.minTemp);
+  const tempFixed = tempRaw.toFixed(1);
+  const tempNumber = parseFloat(tempFixed);
+  
+  if(isNaN(tempNumber)) return;
+
+  const info = getStatus(tempNumber);
+  
+  ui.valTemp.textContent = tempFixed + "°C";
+  ui.valStatus.textContent = info.s;
+  ui.valStatus.style.color = info.c;
+  ui.valTemp.style.color = info.c;
+  
+  ui.mercury.style.height = (pct * 100) + "%";
+  ui.root.style.setProperty('--glow-color', info.c);
+}
+
+function moveKnobTo(temp) {
+  if(!trackHeight) trackHeight = ui.track.clientHeight;
+  
+  const safeTemp = Math.max(SYS.minTemp, Math.min(SYS.maxTemp, temp));
+  const pct = (safeTemp - SYS.minTemp) / (SYS.maxTemp - SYS.minTemp);
+  const targetY = trackHeight * (1 - pct);
+  
+  gsap.to(ui.knob, {
+    y: targetY,
+    duration: 1.2,
+    ease: "back.out(1.2)",
+    onUpdate: updateUI
+  });
+}
+
+// === LÓGICA DAS CIDADES ===
+
+async function initCities() {
+  try {
+    const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/52/municipios');
+    const data = await res.json();
+    
+    citiesDB = data.sort((a,b) => a.nome.localeCompare(b.nome));
+    
+    const goiania = citiesDB.find(c => c.nome === "Goiânia");
+    if(goiania) {
+      citiesDB = citiesDB.filter(c => c.nome !== "Goiânia");
+      citiesDB.unshift(goiania);
+    }
+
+    renderList(citiesDB);
+    fetchWeather("Goiânia", document.querySelector('.city-item'));
+
+  } catch(e) {
+    ui.cityList.innerHTML = "<p style='color:red; text-align:center'>Erro na API do IBGE</p>";
+  }
+}
+
+function renderList(list) {
+  ui.cityList.innerHTML = "";
+  const displayList = list.slice(0, 100);
+  
+  displayList.forEach(city => {
+    const el = document.createElement('div');
+    el.className = 'city-item';
+    el.innerHTML = `<span class="c-name">${city.nome}</span><span class="c-temp">Ver</span>`;
+    
+    el.onclick = () => {
+      document.querySelectorAll('.city-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      el.querySelector('.c-temp').innerHTML = '<span class="spinner">C</span>';
+      
+      fetchWeather(city.nome, el);
+    };
+    
+    ui.cityList.appendChild(el);
+  });
+}
+
+async function fetchWeather(cityName, itemEl) {
+  try {
+    ui.valLabel.textContent = "BUSCANDO DADOS...";
+    
+    const q = encodeURIComponent(cityName);
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${q}&count=10&language=pt&format=json`);
+    const geoData = await geoRes.json();
+    
+    if(!geoData.results) throw new Error("Cidade não achada");
+    
+    let match = geoData.results.find(r => r.admin1 && r.admin1.includes("Goi") && r.country_code === "BR");
+    if(!match) match = geoData.results.find(r => r.country_code === "BR");
+    if(!match) match = geoData.results[0];
+    
+    const { latitude, longitude, name } = match;
+    
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+    const wData = await wRes.json();
+    
+    // --- CALIBRAGEM MANUAL ---
+    const tempRaw = wData.current_weather.temperature;
+    const tempFinal = tempRaw + CALIBRATION; // Aplica seu ajuste manual
+    
+    ui.valLabel.textContent = `EM ${name.toUpperCase()}`;
+    moveKnobTo(tempFinal);
+    
+    if(itemEl) itemEl.querySelector('.c-temp').textContent = tempFinal.toFixed(1) + "°C";
+
+  } catch(err) {
+    console.error(err);
+    ui.valLabel.textContent = "ERRO NA BUSCA";
+    if(itemEl) {
+      itemEl.querySelector('.c-temp').textContent = "Err";
+      setTimeout(() => itemEl.querySelector('.c-temp').textContent = "Ver", 2000);
+    }
+  }
+}
+
+window.onload = () => {
+  const range = SYS.maxTemp - SYS.minTemp;
+  trackHeight = ui.track.clientHeight;
+  
+  for(let t = SYS.minTemp; t <= SYS.maxTemp; t+=10) {
+    const mark = document.createElement('div');
+    mark.textContent = t + "°";
+    mark.style.position = "absolute";
+    mark.style.right = "0";
+    mark.style.fontSize = "12px";
+    mark.style.color = "rgba(255,255,255,0.4)";
+    
+    const pct = (t - SYS.minTemp) / range;
+    mark.style.top = (trackHeight * (1 - pct) - 6) + "px";
+    ui.scaleContainer.appendChild(mark);
+  }
+
+  Draggable.create(ui.knob, {
+    type: "y",
+    bounds: { minY: 0, maxY: trackHeight },
+    inertia: true,
+    onDrag: updateUI,
+    onThrowUpdate: updateUI
+  });
+
+  const startY = trackHeight * 0.5; 
+  gsap.set(ui.knob, { y: startY });
+  updateUI();
+
+  initCities();
+};
+
+ui.searchBox.addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  const filtered = citiesDB.filter(c => c.nome.toLowerCase().includes(term));
+  renderList(filtered);
+});
+
+window.onresize = () => {
+  trackHeight = ui.track.clientHeight;
+  updateUI();
+};
+</script>
+</body>
+</html>
